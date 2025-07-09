@@ -4,10 +4,15 @@ import com.example.carrito1.carrito1.model.Carrito;
 import com.example.carrito1.carrito1.model.ItemCarrito;
 import com.example.carrito1.carrito1.service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/carrito")
@@ -17,19 +22,29 @@ public class CarritoController {
     private CarritoService carritoService;
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<Carrito> obtenerCarrito(@PathVariable Long usuarioId) {
+    public ResponseEntity<EntityModel<Carrito>> obtenerCarrito(@PathVariable Long usuarioId) {
         Carrito carrito = carritoService.obtenerCarritoPorUsuario(usuarioId);
-        return ResponseEntity.ok(carrito);
+        EntityModel<Carrito> carritoModel = EntityModel.of(carrito,
+                linkTo(methodOn(CarritoController.class).obtenerCarrito(usuarioId)).withSelfRel(),
+                linkTo(methodOn(CarritoController.class).listarItems(usuarioId)).withRel("items")
+        );
+        return ResponseEntity.ok(carritoModel);
     }
 
     @PostMapping("/{usuarioId}/agregar")
-    public ResponseEntity<ItemCarrito> agregarProducto(
+    public ResponseEntity<EntityModel<ItemCarrito>> agregarProducto(
             @PathVariable Long usuarioId,
             @RequestParam Long productoId,
             @RequestParam int cantidad) {
 
         ItemCarrito item = carritoService.agregarProducto(usuarioId, productoId, cantidad);
-        return ResponseEntity.ok(item);
+
+        EntityModel<ItemCarrito> itemModel = EntityModel.of(item,
+                linkTo(methodOn(CarritoController.class).agregarProducto(usuarioId, productoId, cantidad)).withSelfRel(),
+                linkTo(methodOn(CarritoController.class).obtenerCarrito(usuarioId)).withRel("carrito")
+        );
+
+        return ResponseEntity.ok(itemModel);
     }
 
     @GetMapping("/{usuarioId}/items")

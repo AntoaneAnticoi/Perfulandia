@@ -1,4 +1,5 @@
 package com.example.carrito1.carrito1.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ public class Carrito {
     private Long usuarioId;
 
     @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ItemCarrito> items = new ArrayList<>();
 
     public Carrito() {

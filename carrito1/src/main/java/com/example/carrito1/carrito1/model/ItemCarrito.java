@@ -1,5 +1,5 @@
 package com.example.carrito1.carrito1.model;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 
@@ -16,6 +16,7 @@ public class ItemCarrito {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrito_id")
+    @JsonBackReference
     private Carrito carrito;
 
     public ItemCarrito() {
